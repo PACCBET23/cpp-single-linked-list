@@ -91,7 +91,7 @@ class SingleLinkedList {
         // Возвращает ссылку на самого себя
         // Инкремент итератора, не указывающего на существующий элемент списка, приводит к неопределённому поведению
         BasicIterator& operator++() noexcept {
-            assert(node_ != nullptr);
+            assert(node_);
             node_ = node_->next_node;
             return *this;
         }
@@ -110,7 +110,7 @@ class SingleLinkedList {
         // Вызов этого оператора у итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         [[nodiscard]] reference operator*() const noexcept {
-            assert(node_ != nullptr);
+            assert(node_);
             return node_->value;
         }
 
@@ -118,7 +118,7 @@ class SingleLinkedList {
         // Вызов этого оператора у итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         [[nodiscard]] pointer operator->() const noexcept {
-            assert(node_ != nullptr);
+            assert(node_);
             return &node_->value;
         }
 
@@ -260,8 +260,8 @@ public:
      */
     Iterator EraseAfter(ConstIterator pos) noexcept {
         assert(IsEmpty() == 0);
-        assert(pos.node_ != nullptr);
-        assert(pos.node_->next_node != nullptr);
+        assert(pos.node_);
+        assert(pos.node_->next_node);
         --size_;
         Node* helper = pos.node_->next_node->next_node;
         delete pos.node_->next_node;
