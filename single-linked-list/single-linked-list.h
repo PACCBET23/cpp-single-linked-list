@@ -91,6 +91,7 @@ class SingleLinkedList {
         // Возвращает ссылку на самого себя
         // Инкремент итератора, не указывающего на существующий элемент списка, приводит к неопределённому поведению
         BasicIterator& operator++() noexcept {
+            assert(node_ != nullptr);
             node_ = node_->next_node;
             return *this;
         }
@@ -109,6 +110,7 @@ class SingleLinkedList {
         // Вызов этого оператора у итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         [[nodiscard]] reference operator*() const noexcept {
+            assert(node_ != nullptr);
             return node_->value;
         }
 
@@ -116,12 +118,8 @@ class SingleLinkedList {
         // Вызов этого оператора у итератора, не указывающего на существующий элемент списка,
         // приводит к неопределённому поведению
         [[nodiscard]] pointer operator->() const noexcept {
-            if (node_) {
-                return &node_->value;
-            }
-            else {
-                return nullptr;
-            }
+            assert(node_ != nullptr);
+            return &node_->value;
         }
 
     private:
@@ -130,17 +128,7 @@ class SingleLinkedList {
 
 public:
 
-    SingleLinkedList() {}
-
-    template <typename TypeIt>
-    void Init(TypeIt begin, TypeIt end) {
-        Node* node = &head_;
-        for (TypeIt i = begin; i != end; ++i) {
-            ++size_;
-            node->next_node = new Node(*i, nullptr);
-            node = node->next_node;
-        }
-    }
+    SingleLinkedList() {}    
 
     SingleLinkedList(std::initializer_list<Type> values) {
         SingleLinkedList helper;
@@ -272,6 +260,8 @@ public:
      */
     Iterator EraseAfter(ConstIterator pos) noexcept {
         assert(IsEmpty() == 0);
+        assert(pos.node_ != nullptr);
+        assert(pos.node_->next_node != nullptr);
         --size_;
         Node* helper = pos.node_->next_node->next_node;
         delete pos.node_->next_node;
@@ -303,6 +293,16 @@ private:
     // Фиктивный узел, используется для вставки "перед первым элементом"
     Node head_;
     size_t size_ = 0;
+
+    template <typename TypeIt>
+    void Init(TypeIt begin, TypeIt end) {
+        Node* node = &head_;
+        for (TypeIt i = begin; i != end; ++i) {
+            ++size_;
+            node->next_node = new Node(*i, nullptr);
+            node = node->next_node;
+        }
+    }
 };
 
 template <typename Type>
@@ -312,7 +312,10 @@ void swap(SingleLinkedList<Type>& lhs, SingleLinkedList<Type>& rhs) noexcept {
 
 template <typename Type>
 bool operator==(const SingleLinkedList<Type>& lhs, const SingleLinkedList<Type>& rhs) {
-    return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    if (lhs.GetSize() != rhs.GetSize()) { // проверяем размеры списков
+        return false;
+    }
+    return std::equal(lhs.begin(), lhs.end(), rhs.begin());    
 }
 
 template <typename Type>
